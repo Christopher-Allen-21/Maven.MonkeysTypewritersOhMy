@@ -1,7 +1,6 @@
 package io.zipcoder;
 
 public class MonkeyTypewriter {
-    public static void main(String[] args) {
         String introduction = "It was the best of times,\n" +
                 "it was the blurst of times,\n" +
                 "it was the age of wisdom,\n" +
@@ -20,56 +19,96 @@ public class MonkeyTypewriter {
                 "its noisiest authorities insisted on its being received, for good or for\n" +
                 "evil, in the superlative degree of comparison only.";
 
+        public final int MAXThReAds = 4;
+        private int max = 0;
+
         // Do all of the Monkey / Thread building here
         // For each Copier(one safe and one unsafe), create and start 5 monkeys copying the introduction to
         // A Tale Of Two Cities.
 
-
-        UnsafeCopier unsafeMonkey1 = new UnsafeCopier(introduction);
-        UnsafeCopier unsafeMonkey2 = new UnsafeCopier(introduction);
-        UnsafeCopier unsafeMonkey3 = new UnsafeCopier(introduction);
-        UnsafeCopier unsafeMonkey4 = new UnsafeCopier(introduction);
-        UnsafeCopier unsafeMonkey5 = new UnsafeCopier(introduction);
-
-        unsafeMonkey1.run();
-        unsafeMonkey2.run();
-        unsafeMonkey3.run();
-        unsafeMonkey4.run();
-        unsafeMonkey5.run();
-
-        SafeCopier safeMonkey1 = new SafeCopier(introduction);
-        SafeCopier safeMonkey2 = new SafeCopier(introduction);
-        SafeCopier safeMonkey3 = new SafeCopier(introduction);
-        SafeCopier safeMonkey4 = new SafeCopier(introduction);
-        SafeCopier safeMonkey5 = new SafeCopier(introduction);
-
-        safeMonkey1.run();
-        safeMonkey2.run();
-        safeMonkey3.run();
-        safeMonkey4.run();
-        safeMonkey5.run();
-
-
-        // This wait is here because main is still a thread and we want the main method to print the finished copies
-        // after enough time has passed.
-        try {
-            Thread.sleep(1000);
-        } catch(InterruptedException e) {
-            System.out.println("MAIN INTERRUPTED");
+        public static void main(String[] args) {
+            MonkeyTypewriter typewriter = new MonkeyTypewriter();
+            typewriter.runThreads();
         }
 
-        // Print out the copied versions here.
-        System.out.println("\nUnsafe Monkey 1:\n"+unsafeMonkey1.copied);
-        System.out.println("\nUnsafe Monkey 2:\n"+unsafeMonkey2.copied);
-        System.out.println("\nUnsafe Monkey 3:\n"+unsafeMonkey3.copied);
-        System.out.println("\nUnsafe Monkey 4:\n"+unsafeMonkey4.copied);
-        System.out.println("\nUnsafe Monkey 5:\n"+unsafeMonkey5.copied);
+        public void runThreads(){
 
-        System.out.println("\nSafe Monkey 1:\n"+safeMonkey1.copied);
-        System.out.println("\nSafe Monkey 2:\n"+safeMonkey2.copied);
-        System.out.println("\nSafe Monkey 3:\n"+safeMonkey3.copied);
-        System.out.println("\nSafe Monkey 4:\n"+safeMonkey4.copied);
-        System.out.println("\nSafe Monkey 5:\n"+safeMonkey5.copied);
+            for(max = MAXThReAds; max<=MAXThReAds; max++){
 
+                UnsafeCopier unsafeCopier = new UnsafeCopier(introduction);
+                unsafeSplitStart(unsafeCopier);
+
+                try {
+                    Thread.sleep(100);
+                    System.out.printf("***** UNSAFE (%d) *****\n", max);
+                    System.out.println(unsafeCopier.copied);
+                    System.out.printf("***** UNSAFE (%d) diff: (%d) *****\n", max, introduction.length() - unsafeCopier.copied.length());
+                    if (unsafeCopier.copied.equals(introduction)) {
+                        System.out.println("***** UNSAFE pass *****");
+                    }
+                    else {
+                        System.out.println("***** UNSAFE FAIL!!! *****");
+                    }
+
+                }
+                catch (InterruptedException e) {
+                    System.out.println("MAIN INTERRUPTED");
+                }
+
+
+
+                SafeCopier safeCopier = new SafeCopier(introduction);
+                safeSplitStarter(safeCopier);
+
+                try {
+                    Thread.sleep(100);
+                    System.out.printf("***** SAFE (%d) *****\n", max);
+                    System.out.println(unsafeCopier.copied);
+                    System.out.printf("***** SAFE (%d) diff: (%d) *****\n", max, introduction.length() - unsafeCopier.copied.length());
+                    if (unsafeCopier.copied.equals(introduction)) {
+                        System.out.println("***** SAFE pass *****");
+                    }
+                    else {
+                        System.out.println("***** SAFE FAIL!!! *****");
+                    }
+
+                }
+                catch (InterruptedException e) {
+                    System.out.println("MAIN INTERRUPTED");
+                }
+
+
+            }
+
+
+        }
+
+    public void unsafeSplitStart(UnsafeCopier unsafe) {
+        // make sure you turn on tread ID printing to see what's happening.
+        for (int i = 0; i < max; i++) {
+            new Thread(unsafe).start();
+
+            try {
+                Thread.sleep(600);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
+
+    public void safeSplitStarter(SafeCopier safe) {
+        for (int i = 0; i < max; i++) {
+            new Thread(safe).start();
+
+            try {
+                Thread.sleep(600);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 }

@@ -1,4 +1,5 @@
 package io.zipcoder;
+import static java.lang.Thread.*;
 
 /**
  * Make this extend the Copier like `UnsafeCopier`, except use locks to make sure that the actual intro gets printed
@@ -9,9 +10,21 @@ public class SafeCopier extends Copier{
         super(toCopy);
     }
 
-    public void run() {
+    public synchronized void run() {
         while(stringIterator.hasNext()){
-            copied += stringIterator.next() + " ";
+            try {
+                sleep(100);
+                if (stringIterator.hasNext()) {
+                    copied += stringIterator.next() + " ";
+                    System.out.println(currentThread().getName());
+                }
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
+
+
+
 }
